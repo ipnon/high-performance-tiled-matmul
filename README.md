@@ -1,14 +1,14 @@
 # High-Performance Tiled Matrix Multiplication
 
-A deep dive into GPU optimization: 10 progressively optimized CUDA kernels, from naive (~1% of cuBLAS) to warptiled (~94% of cuBLAS).
+A deep dive into GPU optimization: 10 progressively optimized CUDA kernels, from naive to warptiled.
 
 Based on [Simon Boehm's excellent worklog](https://siboehm.com/articles/22/CUDA-MMM).
 
 ## Goal
 
-Achieve **90%+ of cuBLAS SGEMM performance** through iterative optimization.
+Achieve **70%+ of cuBLAS SGEMM performance** through iterative optimization.
 
-## Kernel Progression
+## Kernel progression
 
 | Version | Optimization | Key Concept | Target |
 |---------|--------------|-------------|--------|
@@ -23,7 +23,7 @@ Achieve **90%+ of cuBLAS SGEMM performance** through iterative optimization.
 | V8 | Autotuning | Parameter search (BM, BN, BK, TM, TN) | ~85% |
 | V9 | Warptiling | Warp-level scheduling, register cache locality | ~94% |
 
-## Concepts Learned
+## Concepts
 
 - **V0-V1**: Memory coalescing, warp-level access patterns
 - **V2**: Shared memory as programmer-managed cache, `__syncthreads()`
@@ -88,15 +88,46 @@ ncu --metrics l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum ./v6_noco
 ncu --set full -o profile ./benchmark_all
 ```
 
+## Lessons learned
+
+### Memory & Access Patterns
+
+1. Why is coalesced memory access important? What happens at the hardware level when it's not coalesced?
+2. What's the difference between global, shared, and register memory? Latency and bandwidth of each?
+3. Why does accessing `B[k * N + col]` in naive matmul hurt performance?
+
+### Shared Memory
+
+4. What is a bank conflict? How do you detect one? How do you fix it?
+5. Why do we need `__syncthreads()` and what happens if you forget one?
+6. How much shared memory does your GPU have per SM? Per block?
+
+### Performance Analysis
+
+7. What is arithmetic intensity? Why does it matter for the roofline model?
+8. Is your kernel compute-bound or memory-bound? How do you tell?
+9. What does Nsight Compute's "Memory Throughput" vs "Compute Throughput" tell you?
+
+### Parallelism
+
+10. What is a warp? Why does warp divergence hurt performance?
+11. What is occupancy? Is higher always better?
+12. How do you choose block dimensions? What are the tradeoffs?
+
+### Optimization Techniques
+
+13. Why does computing more results per thread improve performance?
+14. What is double buffering and why does it help?
+15. Why are `float4` loads faster than four `float` loads?
+
+### Systems Thinking
+
+16. Given a new kernel that's slow, what's your debugging process?
+17. How would you estimate the theoretical peak performance of a matmul on a given GPU?
+18. Why is cuBLAS still faster than your best kernel? What tricks might they use?
+
 ## References
 
 - [Simon Boehm: How to Optimize a CUDA Matmul Kernel](https://siboehm.com/articles/22/CUDA-MMM)
-- [NVIDIA CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/)
-- [CUTLASS GEMM Tutorial](https://github.com/NVIDIA/cutlass/blob/master/media/docs/efficient_gemm.md)
 - Programming Massively Parallel Processors (Hwu, Kirk & Wen)
 
-## Hardware Target
-
-- NVIDIA A10 (Ampere, SM 8.6)
-- 24 GB GDDR6, ~600 GB/s bandwidth
-- 31.2 TFLOPS FP32 (CUDA cores)
