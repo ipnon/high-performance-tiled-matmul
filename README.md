@@ -130,4 +130,9 @@ ncu --set full -o profile ./benchmark_all
 
 - [Simon Boehm: How to Optimize a CUDA Matmul Kernel](https://siboehm.com/articles/22/CUDA-MMM)
 - Programming Massively Parallel Processors (Hwu, Kirk & Wen)
-
+- NVIDIA CUDA C++ Programming Guide:
+  - [Thread Hierarchy (§5.2)](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#thread-hierarchy)
+  - [Memory Hierarchy (§5.3)](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#memory-hierarchy)
+  - [SIMT Architecture (§7.1)](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#simt-architecture)
+  - [Shared Memory (§6.2.4)](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory)
+  - [Device Memory Accesses (§8.3.2)](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses)
