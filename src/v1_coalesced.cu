@@ -17,11 +17,12 @@
  * in a warp access adjacent elements.
  */
 __global__ void matmul_v1_coalesced(float* A, float* B, float* C, int N) {
-  // Which thread am I from 0 to 255?
+  // Thread mapping:
+  // tid = 0..255  (assuming BLOCK_SIZE=16, so 256 threads per block)
+  // row = blockIdx.y * 16 + (tid / 16)   → local row 0-15
+  // col = blockIdx.x * 16 + (tid % 16)   → local col 0-15
   int tid = threadIdx.x;
-  // Which row of the tile?
   int row = blockIdx.y * BLOCK_SIZE + (tid / BLOCK_SIZE);
-  // Which column of the tile? (consecutive threads -> consecutive columns)
   int col = blockIdx.x * BLOCK_SIZE + (tid % BLOCK_SIZE);
   if (row < N && col < N) {
     float sum = 0.0f;
