@@ -1,26 +1,30 @@
 #pragma once
 #include <cuda_runtime.h>
+#include <curand.h>
 
 #include <cstdio>
 #include <cstdlib>
 
 template <typename KernelFunc>
 inline void run_matmul_test(KernelFunc kernel, size_t n, size_t block_size) {
-  const int bytes = n * n * sizeof(float);
+  const int n_squared = n * n;
+  const int bytes = n_squared * sizeof(float);
 
   float* A_h = static_cast<float*>(malloc(bytes));
   float* B_h = static_cast<float*>(malloc(bytes));
   float* C_h = static_cast<float*>(malloc(bytes));
 
-  for (size_t i = 0; i < n * n; i++) {
-    A_h[i] = 1.0f;
-    B_h[i] = 1.0f;
-  }
-
   float *A_d, *B_d, *C_d;
   cudaMalloc(&A_d, bytes);
   cudaMalloc(&B_d, bytes);
   cudaMalloc(&C_d, bytes);
+
+  // Fill with random [0, 1]
+  curandGenerator_t gen;
+  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(gen, 42);
+  curandGenerateUniform(gen, A_d, n_squared);
+  curandGenerateUniform(gen, B_d, n_squared);
 
   cudaMemcpy(A_d, A_h, bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(B_d, B_h, bytes, cudaMemcpyHostToDevice);
