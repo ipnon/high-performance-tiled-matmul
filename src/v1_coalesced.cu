@@ -19,8 +19,8 @@
 __global__ void matmul_v1_coalesced(float* A, float* B, float* C, int N) {
   // Thread mapping:
   // tid = 0..255  (assuming BLOCK_SIZE=16, so 256 threads per block)
-  // row = blockIdx.y * 16 + (tid / 16)   → local row 0-15
-  // col = blockIdx.x * 16 + (tid % 16)   → local col 0-15
+  // row = blockIdx.y * 16 + (tid / 16)   → local row 0-15 (strided)
+  // col = blockIdx.x * 16 + (tid % 16)   → local col 0-15 (coalesced)
   int tid = threadIdx.x;
   int row = blockIdx.y * BLOCK_SIZE + (tid / BLOCK_SIZE);
   int col = blockIdx.x * BLOCK_SIZE + (tid % BLOCK_SIZE);
