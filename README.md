@@ -65,7 +65,7 @@ Plot each kernel version on the roofline to understand optimization progress:
 
 ### References
 
-- [Roofline: An Insightful Visual Performance Model (Williams et al.)](https://people.eecs.berkeley.edu/~kubitron/cs252/handouts/papers/RooflineVyworky.pdf)
+- [Roofline: An Insightful Visual Performance Model (Williams et al.)](https://people.eecs.berkeley.edu/~kubitron/cs252/handouts/papers/RooflineVyNoYellow.pdf)
 - Nsight Compute roofline analysis documentation
 
 ## Lessons learned

@@ -33,4 +33,7 @@ __global__ void matmul_v3_noconflict(float* A, float* B, float* C, int N) {
   C[row * N + col] = sum;
 }
 
-int main() { run_matmul_test<16>(matmul_v3_noconflict<16>, 1024); }
+int main() {
+  constexpr int kBlockSize = 16;
+  run_matmul_test<kBlockSize>(matmul_v3_noconflict<kBlockSize>, 1024);
+}

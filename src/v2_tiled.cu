@@ -43,4 +43,7 @@ __global__ void matmul_v2_tiled(float* A, float* B, float* C, int N) {
   C[row * N + col] = sum;  // Write to the global position in 1D answer
 }
 
-int main() { run_matmul_test<16>(matmul_v2_tiled<16>, 1024); }
+int main() {
+  constexpr int kBlockSize = 16;
+  run_matmul_test<kBlockSize>(matmul_v2_tiled<kBlockSize>, 1024);
+}

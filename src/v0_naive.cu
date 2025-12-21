@@ -22,4 +22,7 @@ __global__ void matmul_v0_naive(float* A, float* B, float* C, int N) {
   }
 }
 
-int main() { run_matmul_test<16>(matmul_v0_naive<16>, 1024); }
+int main() {
+  constexpr int kBlockSize = 16;
+  run_matmul_test<kBlockSize>(matmul_v0_naive<kBlockSize>, 1024);
+}
