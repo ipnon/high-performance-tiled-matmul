@@ -16,14 +16,15 @@
  * This optimization reorders thread-to-output mapping so that threads
  * in a warp access adjacent elements.
  */
+template <int kBlockSize>
 __global__ void matmul_v1_coalesced(float* A, float* B, float* C, int N) {
   // Thread mapping:
-  // tid = 0..255  (assuming BLOCK_SIZE=16, so 256 threads per block)
+  // tid = 0..255  (assuming kBlockSize=16, so 256 threads per block)
   // row = blockIdx.y * 16 + (tid / 16)   → local row 0-15 (strided)
   // col = blockIdx.x * 16 + (tid % 16)   → local col 0-15 (coalesced)
   int tid = threadIdx.x;
-  int row = blockIdx.y * BLOCK_SIZE + (tid / BLOCK_SIZE);
-  int col = blockIdx.x * BLOCK_SIZE + (tid % BLOCK_SIZE);
+  int row = blockIdx.y * kBlockSize + (tid / kBlockSize);
+  int col = blockIdx.x * kBlockSize + (tid % kBlockSize);
   if (row < N && col < N) {
     float sum = 0.0f;
     for (int k = 0; k < N; k++) {
@@ -33,4 +34,4 @@ __global__ void matmul_v1_coalesced(float* A, float* B, float* C, int N) {
   }
 }
 
-int main() { run_matmul_test(matmul_v1_coalesced, 1024, 16); }
+int main() { run_matmul_test<16>(matmul_v1_coalesced<16>, 1024); }

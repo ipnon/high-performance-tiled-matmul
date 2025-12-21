@@ -3,10 +3,11 @@
 #include <common.cuh>
 #include <cstdio>
 
+template <int kBlockSize>
 __global__ void matmul_v0_naive(float* A, float* B, float* C, int N) {
   // Calculate this thread's global row and column
-  int row = blockIdx.y * blockDim.y + threadIdx.y;
-  int col = blockIdx.x * blockDim.x + threadIdx.x;
+  int row = blockIdx.y * kBlockSize + threadIdx.y;
+  int col = blockIdx.x * kBlockSize + threadIdx.x;
   // Do not compute outside of the matrix bounds
   if (row < N && col < N) {
     // Initialize the accumulator for the dot product
@@ -21,4 +22,4 @@ __global__ void matmul_v0_naive(float* A, float* B, float* C, int N) {
   }
 }
 
-int main() { run_matmul_test(matmul_v0_naive, 1024, 16); }
+int main() { run_matmul_test<16>(matmul_v0_naive<16>, 1024); }

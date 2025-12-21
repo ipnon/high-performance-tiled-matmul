@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-template <typename KernelFunc>
-inline void run_matmul_test(KernelFunc kernel, size_t n, size_t block_size) {
+template <int kBlockSize, typename KernelFunc>
+inline void run_matmul_test(KernelFunc kernel, size_t n) {
   const int n_squared = n * n;
   const int bytes = n_squared * sizeof(float);
 
@@ -29,9 +29,9 @@ inline void run_matmul_test(KernelFunc kernel, size_t n, size_t block_size) {
   cudaMemcpy(A_d, A_h, bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(B_d, B_h, bytes, cudaMemcpyHostToDevice);
 
-  int threads = block_size * block_size;
-  dim3 blocks((n + block_size - 1) / block_size,
-              (n + block_size - 1) / block_size);
+  dim3 threads(kBlockSize, kBlockSize);
+  dim3 blocks((n + kBlockSize - 1) / kBlockSize,
+              (n + kBlockSize - 1) / kBlockSize);
 
   kernel<<<blocks, threads>>>(A_d, B_d, C_d, n);
 
