@@ -114,7 +114,7 @@ Plot each kernel version on the roofline to understand optimization progress:
 - [CUTLASS: Efficient GEMM in CUDA](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/efficient_gemm.md)
 - Programming Massively Parallel Processors (Hwu, Kirk & Wen)
 
-### CUDA C++ Programming Guide — Reading order
+### [CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/index.html) — Reading order
 
 Read these sections before implementing each kernel:
 
