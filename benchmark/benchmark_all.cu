@@ -129,17 +129,12 @@ int main() {
   printf("==========================\n");
   printf("GPU: %s (%.1f TFLOPS FP32 peak)\n\n", prop.name, peak_tflops);
 
-  // Header
-  printf("%6s", "N");
-  for (const auto& k : kernels) printf(" | %7s", k.name.c_str());
-  printf(" | %9s\n", "cuBLAS");
+  // Collect all results first
+  std::vector<std::vector<float>> results(kernels.size() + 1);  // +1 for cuBLAS
+  for (auto& row : results) row.resize(sizes.size());
 
-  printf("------");
-  for (size_t i = 0; i < kernels.size(); i++) printf("-|--------");
-  printf("-|----------\n");
-
-  // Run benchmarks
-  for (int n : sizes) {
+  for (size_t si = 0; si < sizes.size(); si++) {
+    int n = sizes[si];
     float *A, *B, *C;
     cudaMalloc(&A, n * n * sizeof(float));
     cudaMalloc(&B, n * n * sizeof(float));
@@ -152,55 +147,56 @@ int main() {
     curandGenerateUniform(gen, B, n * n);
     curandDestroyGenerator(gen);
 
-    float cublas = benchmark_cublas(A, B, C, n);
-
-    printf("%6d", n);
-    for (const auto& k : kernels) {
-      float gflops = k.run(A, B, C, n);
-      printf(" | %7.0f", gflops);
+    for (size_t ki = 0; ki < kernels.size(); ki++) {
+      results[ki][si] = kernels[ki].run(A, B, C, n);
     }
-    printf(" | %9.0f\n", cublas);
+    results[kernels.size()][si] = benchmark_cublas(A, B, C, n);
 
     cudaFree(A);
     cudaFree(B);
     cudaFree(C);
   }
 
-  // Summary with percentages
-  printf("\n%% of cuBLAS:\n");
-  printf("%6s", "N");
-  for (const auto& k : kernels) printf(" | %7s", k.name.c_str());
+  // Print GFLOPS table (kernels as rows, sizes as columns)
+  printf("GFLOPS:\n");
+  printf("%-8s", "Kernel");
+  for (int n : sizes) printf(" | %6d", n);
   printf("\n");
 
-  printf("------");
-  for (size_t i = 0; i < kernels.size(); i++) printf("-|--------");
+  printf("--------");
+  for (size_t i = 0; i < sizes.size(); i++) printf("-|-------");
   printf("\n");
 
-  for (int n : sizes) {
-    float *A, *B, *C;
-    cudaMalloc(&A, n * n * sizeof(float));
-    cudaMalloc(&B, n * n * sizeof(float));
-    cudaMalloc(&C, n * n * sizeof(float));
-
-    curandGenerator_t gen;
-    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-    curandSetPseudoRandomGeneratorSeed(gen, 42);
-    curandGenerateUniform(gen, A, n * n);
-    curandGenerateUniform(gen, B, n * n);
-    curandDestroyGenerator(gen);
-
-    float cublas = benchmark_cublas(A, B, C, n);
-
-    printf("%6d", n);
-    for (const auto& k : kernels) {
-      float gflops = k.run(A, B, C, n);
-      printf(" | %6.1f%%", 100.0f * gflops / cublas);
+  for (size_t ki = 0; ki < kernels.size(); ki++) {
+    printf("%-8s", kernels[ki].name.c_str());
+    for (size_t si = 0; si < sizes.size(); si++) {
+      printf(" | %6.0f", results[ki][si]);
     }
     printf("\n");
+  }
+  printf("%-8s", "cuBLAS");
+  for (size_t si = 0; si < sizes.size(); si++) {
+    printf(" | %6.0f", results[kernels.size()][si]);
+  }
+  printf("\n");
 
-    cudaFree(A);
-    cudaFree(B);
-    cudaFree(C);
+  // Print % of cuBLAS table
+  printf("\n%% of cuBLAS:\n");
+  printf("%-8s", "Kernel");
+  for (int n : sizes) printf(" | %6d", n);
+  printf("\n");
+
+  printf("--------");
+  for (size_t i = 0; i < sizes.size(); i++) printf("-|-------");
+  printf("\n");
+
+  for (size_t ki = 0; ki < kernels.size(); ki++) {
+    printf("%-8s", kernels[ki].name.c_str());
+    for (size_t si = 0; si < sizes.size(); si++) {
+      float pct = 100.0f * results[ki][si] / results[kernels.size()][si];
+      printf(" | %5.1f%%", pct);
+    }
+    printf("\n");
   }
 
   printf("\nTarget: V6 >= 70%% of cuBLAS across all sizes\n");
