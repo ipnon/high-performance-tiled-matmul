@@ -34,3 +34,7 @@ foreach(kernel ${KERNELS})
     add_executable(${kernel} src/${kernel}.cu)
     target_link_libraries(${kernel} PRIVATE common)
 endforeach()
+
+# Benchmark suite
+add_executable(benchmark_all benchmark/benchmark_all.cu)
+target_link_libraries(benchmark_all PRIVATE CUDA::curand CUDA::cublas)
