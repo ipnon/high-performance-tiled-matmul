@@ -37,4 +37,5 @@ endforeach()
 
 # Benchmark suite
 add_executable(benchmark_all benchmark/benchmark_all.cu)
+target_include_directories(benchmark_all PRIVATE include)
 target_link_libraries(benchmark_all PRIVATE CUDA::curand CUDA::cublas)
