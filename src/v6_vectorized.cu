@@ -5,8 +5,9 @@
 
 template <int kBlockM, int kBlockN, int kBlockK, int kThreadM, int kThreadN>
 __global__ void matmul_v6_vectorized(float* A, float* B, float* C, int N) {
-  __shared__ float smem_A[kBlockM][kBlockK];
-  __shared__ float smem_B[kBlockK][kBlockN];
+  // Pad to avoid bank conflicts
+  __shared__ float smem_A[kBlockM][kBlockK + 1];
+  __shared__ float smem_B[kBlockK][kBlockN + 1];
   float accum[kThreadM * kThreadN] = {0.0f};
   int bm = blockIdx.y;
   int bn = blockIdx.x;

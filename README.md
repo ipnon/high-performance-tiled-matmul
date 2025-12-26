@@ -110,6 +110,7 @@ Plot each kernel version on the roofline to understand optimization progress:
 
 - [Simon Boehm: How to Optimize a CUDA Matmul Kernel](https://siboehm.com/articles/22/CUDA-MMM) ([HN discussion](https://news.ycombinator.com/item?id=34256392))
 - [wangzyon/NVIDIA_SGEMM_PRACTICE](https://github.com/wangzyon/NVIDIA_SGEMM_PRACTICE)
+- [CUTLASS: Efficient GEMM in CUDA](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/efficient_gemm.md)
 - Programming Massively Parallel Processors (Hwu, Kirk & Wen)
 
 ### CUDA C++ Programming Guide — Reading order
