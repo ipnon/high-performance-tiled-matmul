@@ -15,6 +15,7 @@
 #include <kernels/v4_blocktile_1d.cuh>
 #include <kernels/v5_blocktile_2d.cuh>
 #include <kernels/v6_vectorized.cuh>
+#include <kernels/v7_swizzle.cuh>
 
 // Tile parameters
 constexpr int kBlockSize = 16;
@@ -113,6 +114,11 @@ std::vector<KernelConfig> make_kernels() {
       dim3 threads((BM / TM) * (BN / TN));
       dim3 blocks(n / BN, n / BM);
       return benchmark_kernel(matmul_v6_vectorized<BM, BN, BK, TM, TN>, A, B, C, n, threads, blocks);
+    }},
+    {"V7", [](float* A, float* B, float* C, int n) {
+      dim3 threads((BM / TM) * (BN / TN));
+      dim3 blocks(n / BN, n / BM);
+      return benchmark_kernel(matmul_v7_swizzle<BM, BN, BK, TM, TN>, A, B, C, n, threads, blocks);
     }},
   };
 }
