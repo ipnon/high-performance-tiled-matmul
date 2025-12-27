@@ -33,3 +33,8 @@ endforeach()
 add_executable(benchmark_all benchmark/benchmark_all.cu)
 target_include_directories(benchmark_all PRIVATE include)
 target_link_libraries(benchmark_all PRIVATE CUDA::curand CUDA::cublas)
+
+# Autotuner demo
+add_executable(autotune_demo benchmark/autotune_demo.cu)
+target_include_directories(autotune_demo PRIVATE include)
+target_link_libraries(autotune_demo PRIVATE CUDA::curand CUDA::cublas)
