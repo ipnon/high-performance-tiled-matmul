@@ -12,7 +12,7 @@ add_library(common INTERFACE)
 target_include_directories(common INTERFACE include)
 target_link_libraries(common INTERFACE CUDA::curand CUDA::cublas)
 
-# Kernel executables
+# Kernel executables (add new kernels here as implemented)
 set(KERNELS
     v0_naive
     v1_coalesced
@@ -21,13 +21,6 @@ set(KERNELS
     v4_blocktile_1d
     v5_blocktile_2d
     v6_vectorized
-    v7_double_buffer
-    v8_register_prefetch
-    v9_warptiled
-    v10_warp_shuffle
-    v11_swizzle
-    v12_splitk
-    v13_autotuned
 )
 
 foreach(kernel ${KERNELS})
